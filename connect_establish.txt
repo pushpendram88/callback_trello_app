@@ -1,0 +1,38 @@
+curl -X POST -H "Content-Type: application/json" \
+https://api.trello.com/1/tokens/78046e14bdaf00f17c22a610efa72632d56855e516cd8518463e546142554b2f/webhooks/ \
+-d '{
+  "key": "69d1d5e63069d7161380db61eaefd7d1",
+  "callbackURL": "https://03d6-2401-4900-1c19-1edc-6577-78bb-822d-2739.ngrok.io/api/v1/webhooks",
+  "idModel":"6336a3220875e7050486ffe5",
+  "description": "My first webhook"
+}'
+
+
+-----------------------------------
+      def create
+        @card = Card.new(permit_params)
+        response = begin
+          JSON.parse(create_card_in_trello.read_body)
+        rescue StandardError
+          create_card_in_trello.to_s
+        end
+        if response['id'].present?
+          # @card.trello_card_id = response['id']
+          # if @card.save
+            render json: { message: 'Card created successfully.', card: @card }, status: 201
+            puts 'Data Created'
+          # else
+          #   puts 'Data Not Created'
+          #   render json: { message: 'Card Not Created.', errors: @card.errors.full_messages }, status: 422
+          # end
+        else
+          render json: { errors: create_card_in_trello.read_body }, status: 422
+        end
+      end
+
+
+
+    # it "should not create and give validation error" do
+    #   post :create, params: { "text" => nil }
+    #   expect(response).to have_http_status(:unprocessable_entity)
+    # end
